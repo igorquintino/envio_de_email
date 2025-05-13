@@ -17,8 +17,8 @@ app.post('/enviar-email', async (req, res) => {
   const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-      user: 'igorcarvalho2907@gmail.com',
-      pass: 'huig vybf nsdz bqmy', // Use senha de app, não a senha comum
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS, // Use senha de app, não a senha comum
     },
   });
 
