@@ -1,0 +1,5 @@
+[[redirects]]
+  from = "/enviar-email"
+  to = "https://enviodemail-production.up.railway.app/enviar-email"
+  status = 200
+  force = true
