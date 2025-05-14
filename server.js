@@ -71,10 +71,10 @@ app.post('/enviar-email', async (req, res) => {
         <p>Dá uma olhada em como ele é por dentro:</p>
 
         <div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin: 20px 0;">
-          <img src="https://i.imgur.com/U9nzRBR.png" width="180" style="border-radius: 8px;">
-          <img src="https://i.imgur.com/r2EE0UL.jpeg" width="180" style="border-radius: 8px;">
-          <img src="https://i.imgur.com/4HMyPLV.jpeg" width="180" style="border-radius: 8px;">
-          <img src="https://i.imgur.com/klc8qM2.jpeg" width="180" style="border-radius: 8px;">
+          <img src="https://i.imgur.com/U9nzRBR.png" width="280" style="border-radius: 8px;">
+          <img src="https://i.imgur.com/r2EE0UL.jpeg" width="280" style="border-radius: 8px;">
+          <img src="https://i.imgur.com/4HMyPLV.jpeg" width="280" style="border-radius: 8px;">
+          <img src="https://i.imgur.com/klc8qM2.jpeg" width="280" style="border-radius: 8px;">
         </div>
 
         <a href="https://seulink.com/planner"
