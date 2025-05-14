@@ -71,7 +71,7 @@ app.post('/enviar-email', async (req, res) => {
         <p>Dá uma olhada em como ele é por dentro:</p>
 
         <div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin: 20px 0;">
-          <img src="https://enviodemail-production.up.railway.app/img1.png" width="180" style="border-radius: 8px;">
+          <img src="https://i.imgur.com/U9nzRBR.png" width="180" style="border-radius: 8px;">
           <img src="https://imgur.com/a/gAf63Ts" width="180" style="border-radius: 8px;">
           <img src="img 1.png" width="180" style="border-radius: 8px;">
           <img src="img 2.png" width="180" style="border-radius: 8px;">
