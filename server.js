@@ -77,9 +77,9 @@ app.post('/enviar-email', async (req, res) => {
           <img src="https://i.imgur.com/klc8qM2.jpeg" width="280" style="border-radius: 8px;">
         </div>
 
-        <a href="https://seulink.com/planner"
+        <a href="https://pay.kiwify.com.br/r5H2nqm"
            style="display:inline-block; background:#a855f7; color:#fff; padding:14px 32px; text-decoration:none; border-radius:8px; font-weight:bold; font-size:16px; margin-top: 10px;">
-          >> Quero conhecer o Planner Dev Express
+          >> Quero Investir em minha carreira usando o Planner Quintino Coders!
         </a>
 
         <br><br>
