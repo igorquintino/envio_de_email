@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Planner Quintino Coders</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Arial', sans-serif;
+    }
+
+    body {
+      background: #0e0e1c;
+      color: #fff;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .hero {
+      text-align: center;
+      padding: 40px 20px;
+    }
+
+    .hero h1 {
+      font-size: 2.8rem;
+      color: #a855f7;
+      margin-bottom: 20px;
+    }
+
+    .hero p {
+      font-size: 1.2rem;
+      margin-bottom: 30px;
+    }
+
+    .cta-button {
+      background-color: #a855f7;
+      color: white;
+      border: none;
+      padding: 15px 30px;
+      font-size: 1.2rem;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .cta-button:hover {
+      background-color: #9333ea;
+    }
+
+    .section {
+      margin-top: 60px;
+    }
+
+    .section h2 {
+      font-size: 2rem;
+      margin-bottom: 20px;
+      color: #a855f7;
+      text-align: center;
+    }
+
+    .section p {
+      font-size: 1.1rem;
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .benefits ul {
+      list-style: none;
+      padding-left: 0;
+      max-width: 600px;
+      margin: 0 auto 30px;
+    }
+
+    .benefits li {
+      margin-bottom: 15px;
+      position: relative;
+      padding-left: 24px;
+    }
+
+    .benefits li::before {
+      content: "✔";
+      position: absolute;
+      left: 0;
+      color: #a855f7;
+    }
+
+    .gallery {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+      margin-bottom: 40px;
+    }
+
+    .gallery img {
+      max-width: 280px;
+      border-radius: 10px;
+    }
+
+    .testimonial {
+      background-color: #1c1c2e;
+      padding: 20px;
+      border-radius: 10px;
+      margin: 10px auto;
+      max-width: 600px;
+      text-align: left;
+    }
+
+    .testimonial p {
+      font-style: italic;
+    }
+
+    @media (max-width: 600px) {
+      .hero h1 {
+        font-size: 2rem;
+      }
+
+      .hero p, .section p {
+        font-size: 1rem;
+      }
+
+      .cta-button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <section class="hero">
+      <h1>O Planner que Vai Ajudar Você a Conquistar Seu Primeiro Emprego</h1>
+      <p>Se sua rotina está desorganizada, suas metas estão soltas e você não sabe por onde começar, esse planner é o seu guia. Organize, aprenda, evolua.</p>
+      <a href="https://seulink.com/planner" target="_blank">
+        <button class="cta-button">Quero meu Planner agora!</button>
+      </a>
+    </section>
+
+    <section class="section">
+      <h2>O problema não é falta de conteúdo. É falta de direção.</h2>
+      <p>Você passa horas vendo vídeos e salvando posts, mas continua sem sair do lugar? O verdadeiro motivo pode ser a desorganização e falta de foco. O Planner Quintino Coders resolve isso.</p>
+      <div class="benefits">
+        <ul>
+          <li>Mais de 100 ideias de projetos por nível e linguagem</li>
+          <li>Roadmaps para diferentes áreas da programação</li>
+          <li>Checklist de estudos práticos para aplicar agora</li>
+          <li>Lista atualizada de sites de vagas confiáveis</li>
+          <li>Formato digital e imprimível para usar como quiser</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Veja o Planner por dentro</h2>
+      <div class="gallery">
+        <img src="https://i.imgur.com/U9nzRBR.png" alt="Página de Projetos">
+        <img src="https://i.imgur.com/r2EE0UL.jpeg" alt="Roadmap de Carreira">
+        <img src="https://i.imgur.com/4HMyPLV.jpeg" alt="Checklist de Estudos">
+        <img src="https://i.imgur.com/klc8qM2.jpeg" alt="Checklist de Estudos">
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Quem já usou recomenda:</h2>
+      <div class="testimonial">
+        <p>“Antes do planner, eu me sentia perdido. Agora tenho um plano de verdade e estou aplicando todo dia.” – João L.</p>
+      </div>
+      <div class="testimonial">
+        <p>“Foi com esse planner que montei meu portfólio e comecei a aplicar para vagas com confiança.” – Marina S.</p>
+      </div>
+    </section>
+
+    <section class="hero">
+      <a href="https://seulink.com/planner" target="_blank">
+        <button class="cta-button">Garanta o seu agora</button>
+      </a>
+    </section>
+  </div>
+</body>
+</html>
