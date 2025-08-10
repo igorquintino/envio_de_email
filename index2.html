@@ -43,15 +43,16 @@
       Liberar Download
     </button>
 
-    <p id="statusEmail" style="margin-top: 15px; color: #ccc;"></p>
+    <!-- Mensagem só para erros -->
+    <p id="statusEmail" style="margin-top: 15px; color: #f87171;"></p>
 
-    <!-- Seção de download (começa oculta) -->
+    <!-- Seção de download (fica oculta até liberar) -->
     <div id="downloadSection" style="display:none; margin-top: 20px;">
-      <a id="downloadLink" href="curriculo-perfeito.pdf" download
+      <a id="downloadLink" href="#" download
          style="display:inline-block; padding: 12px 20px; border-radius: 6px; text-decoration: none; font-weight: bold; background:#a855f7; color:#fff;">
         Baixar Currículo
       </a>
-      <p style="color:#9ae6b4; margin-top:10px;">Download liberado! Se não iniciar automaticamente, clique no botão acima.</p>
+      <p style="color:#9ae6b4; margin-top:10px;">Se não iniciar automaticamente, clique no botão acima.</p>
     </div>
   </div>
 
@@ -62,62 +63,88 @@
     const downloadSection = document.getElementById('downloadSection');
     const downloadLink = document.getElementById('downloadLink');
 
-    // Ajuste o caminho do arquivo aqui:
-    const DOWNLOAD_URL = 'https://drive.google.com/uc?export=download&id=15-_Blz44Xr-Nj4L-F4fVXikmVBpVnDVY';
+    // Validação de e-mail mais permissiva (aceita TLDs longos e "+")
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
-    // Regex igual à sua (observação: TLD 2–6 letras)
-    const emailRegex = /^[a-zA-Z0-9._+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+    // Endpoint do backend que retorna { downloadUrl }
+    const API_URL = '/enviar-email'; // ajuste se estiver em outro domínio
 
     emailInput.addEventListener('input', () => {
       const email = emailInput.value.trim();
       const isValid = emailRegex.test(email);
+
+      statusEmail.textContent = '';
+      downloadSection.style.display = 'none';
 
       if (isValid) {
         enviarBtn.disabled = false;
         enviarBtn.style.backgroundColor = '#a855f7';
         enviarBtn.style.color = '#fff';
         enviarBtn.style.cursor = 'pointer';
-        statusEmail.textContent = '';
       } else {
         enviarBtn.disabled = true;
         enviarBtn.style.backgroundColor = '#555';
         enviarBtn.style.color = '#aaa';
         enviarBtn.style.cursor = 'not-allowed';
-        statusEmail.textContent = 'Por favor, insira um e-mail válido.';
-        downloadSection.style.display = 'none';
       }
     });
 
-    enviarBtn.addEventListener('click', () => {
+    enviarBtn.addEventListener('click', async () => {
       const email = emailInput.value.trim();
       if (!emailRegex.test(email)) {
         statusEmail.textContent = 'Por favor, insira um e-mail válido.';
         return;
       }
 
-      // Opcional: guarda o e-mail localmente (ex.: para preencher depois)
-      try { localStorage.setItem('leadEmail', email); } catch (e) {}
+      // estado "carregando"
+      enviarBtn.disabled = true;
+      const originalText = enviarBtn.textContent;
+      enviarBtn.textContent = 'Liberando...';
+      enviarBtn.style.backgroundColor = '#555';
+      enviarBtn.style.color = '#aaa';
+      statusEmail.textContent = '';
 
-      // Libera a seção de download
-      downloadLink.href = DOWNLOAD_URL;
-      downloadSection.style.display = 'block';
+      try {
+        const resp = await fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email })
+        });
 
-      // Dispara evento do pixel (opcional)
-      if (typeof fbq === 'function') {
-        fbq('track', 'Lead', { content_name: 'Curriculo Perfeito' });
+        const data = await resp.json().catch(() => ({}));
+
+        if (!resp.ok || !data.downloadUrl) {
+          throw new Error(data?.error || 'Não foi possível liberar o download.');
+        }
+
+        // Dispara evento do pixel (opcional)
+        if (typeof fbq === 'function') {
+          fbq('track', 'Lead', { content_name: 'Curriculo Perfeito' });
+        }
+
+        // Libera a seção e configura o link
+        downloadLink.href = data.downloadUrl;
+        downloadSection.style.display = 'block';
+
+        // Inicia o download automático
+        const a = document.createElement('a');
+        a.href = data.downloadUrl;
+        a.setAttribute('download', '');
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+
+      } catch (err) {
+        statusEmail.textContent = err.message || 'Erro ao liberar o download.';
+      } finally {
+        // restaura botão (mantém habilitado se e-mail ainda é válido)
+        enviarBtn.textContent = originalText;
+        const stillValid = emailRegex.test(emailInput.value.trim());
+        enviarBtn.disabled = !stillValid;
+        enviarBtn.style.backgroundColor = stillValid ? '#a855f7' : '#555';
+        enviarBtn.style.color = stillValid ? '#fff' : '#aaa';
+        enviarBtn.style.cursor = stillValid ? 'pointer' : 'not-allowed';
       }
-
-      // Tenta iniciar o download automaticamente
-      const a = document.createElement('a');
-      a.href = DOWNLOAD_URL;
-      a.setAttribute('download', '');
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-
-      // Feedback visual
-      statusEmail.style.color = '#9ae6b4';
-      statusEmail.textContent = 'Pronto! Download liberado.';
     });
   </script>
 </body>
