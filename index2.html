@@ -49,7 +49,7 @@
     <!-- Seção de download (fica oculta até liberar) -->
     <div id="downloadSection" style="display:none; margin-top: 20px;">
       <a id="downloadLink" href="#" download
-         style="display:inline-block; padding: 12px 20px; border-radius: 6px; text-decoration: none; font-weight: bold; background:#a855f7; color:#fff;">
+         style="display:inline-block; padding: 12px 20px; border-radius: 6px; text-decoration: none; font-weight: bold;">
         Baixar Currículo
       </a>
       <p style="color:#9ae6b4; margin-top:10px;">Se não iniciar automaticamente, clique no botão acima.</p>
@@ -66,8 +66,8 @@
     // Validação de e-mail mais permissiva (aceita TLDs longos e "+")
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
-    // Endpoint do backend que retorna { downloadUrl }
-    const API_URL = '/enviar-email'; // ajuste se estiver em outro domínio
+    // ✅ URL completa do Railway (ajuste se seu subdomínio for outro)
+    const API_URL = 'https://enviodemail-production.up.railway.app/enviar-email';
 
     emailInput.addEventListener('input', () => {
       const email = emailInput.value.trim();
@@ -117,7 +117,7 @@
           throw new Error(data?.error || 'Não foi possível liberar o download.');
         }
 
-        // Dispara evento do pixel (opcional)
+        // Pixel opcional
         if (typeof fbq === 'function') {
           fbq('track', 'Lead', { content_name: 'Curriculo Perfeito' });
         }
