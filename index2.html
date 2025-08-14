@@ -35,72 +35,76 @@
     <label for="emailInput" style="position:absolute; left:-9999px;">E-mail</label>
     <input type="email" id="emailInput" placeholder="Digite seu e-mail"
            style="width: 100%; max-width: 400px; padding: 12px; border-radius: 6px; border: none; margin-bottom: 15px;" autocomplete="email">
-    <br>
-    
+
     <button id="baixarBtn" disabled
             style="background-color: #555; color: #aaa; font-weight: bold; border: none; padding: 12px 24px; border-radius: 6px; cursor: not-allowed;">
       Baixar
     </button>
   </div>
 
-  <!-- Formulário oculto do Google Forms -->
-  <iframe name="hidden_iframe" style="display:none;"></iframe>
-  <form id="leadForm"
-        action="https://docs.google.com/forms/d/e/1FAIpQLSfZBig3TCIM3_Pk5m_gEQkPcfAAhRAOLhvF7XDMbu9M8DBM_w/formResponse"
-        method="POST" target="hidden_iframe" style="display:none;">
-    <input id="gformEmail" name="entry.1038736519" type="email" />
-  </form>
-
   <script>
-    const emailInput = document.getElementById('emailInput');
-    const baixarBtn = document.getElementById('baixarBtn');
-    const leadForm = document.getElementById('leadForm');
-    const gformEmail = document.getElementById('gformEmail');
-
-    // Link direto de download do arquivo no Google Drive
+    // === CONFIGS ===
+    // Google Forms: seu FORM_ID e ENTRY_ID
+    const FORM_ACTION = 'https://docs.google.com/forms/d/e/1FAIpQLSfZBig3TCIM3_Pk5m_gEQkPcfAAhRAOLhvF7XDMbu9M8DBM_w/formResponse';
+    const ENTRY_NAME = 'entry.1038736519';
+    // Link direto do Drive
     const DOWNLOAD_URL = 'https://drive.google.com/uc?export=download&id=1zoF2itav5kKyzRmuEFYfcpePyF8E5iUT';
 
-    // Regex para validar e-mail
+    const emailInput = document.getElementById('emailInput');
+    const baixarBtn = document.getElementById('baixarBtn');
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
     emailInput.addEventListener('input', () => {
-      const email = emailInput.value.trim();
-      const isValid = emailRegex.test(email);
-
-      if (isValid) {
-        baixarBtn.disabled = false;
-        baixarBtn.style.backgroundColor = '#a855f7';
-        baixarBtn.style.color = '#fff';
-        baixarBtn.style.cursor = 'pointer';
-      } else {
-        baixarBtn.disabled = true;
-        baixarBtn.style.backgroundColor = '#555';
-        baixarBtn.style.color = '#aaa';
-        baixarBtn.style.cursor = 'not-allowed';
-      }
+      const ok = emailRegex.test(emailInput.value.trim());
+      baixarBtn.disabled = !ok;
+      baixarBtn.style.backgroundColor = ok ? '#a855f7' : '#555';
+      baixarBtn.style.color = ok ? '#fff' : '#aaa';
+      baixarBtn.style.cursor = ok ? 'pointer' : 'not-allowed';
     });
 
-    baixarBtn.addEventListener('click', (e) => {
+    baixarBtn.addEventListener('click', async (e) => {
       e.preventDefault();
       const email = emailInput.value.trim();
       if (!emailRegex.test(email)) return;
 
-      // Envia o e-mail para o Google Forms
-      gformEmail.value = email;
-      try { leadForm.submit(); } catch (err) {}
+      // estado loading
+      const originalText = baixarBtn.textContent;
+      baixarBtn.textContent = 'Processando...';
+      baixarBtn.disabled = true;
+      baixarBtn.style.backgroundColor = '#555';
+      baixarBtn.style.color = '#aaa';
 
-      // Pixel opcional
-      if (typeof fbq === 'function') {
-        fbq('track', 'Lead', { content_name: 'Curriculo Perfeito' });
+      // Envia ao Google Forms (sem bloquear por CORS)
+      try {
+        const formData = new FormData();
+        formData.append(ENTRY_NAME, email);
+
+        // Importantíssimo: no-cors → submissão “silenciosa”
+        await fetch(FORM_ACTION, { method: 'POST', mode: 'no-cors', body: formData });
+
+        // Pixel opcional
+        if (typeof fbq === 'function') {
+          fbq('track', 'Lead', { content_name: 'Curriculo Perfeito' });
+        }
+      } catch (_) {
+        // mesmo que falhe a coleta, seguimos com o download
       }
 
-      // Dispara o download
+      // Dispara o download direto
       const a = document.createElement('a');
       a.href = DOWNLOAD_URL;
       a.setAttribute('download', '');
       document.body.appendChild(a);
       a.click();
       a.remove();
+
+      // restaura estado do botão (mantém habilitado se e-mail ainda é válido)
+      baixarBtn.textContent = originalText;
+      const stillOk = emailRegex.test(emailInput.value.trim());
+      baixarBtn.disabled = !stillOk;
+      baixarBtn.style.backgroundColor = stillOk ? '#a855f7' : '#555';
+      baixarBtn.style.color = stillOk ? '#fff' : '#aaa';
+      baixarBtn.style.cursor = stillOk ? 'pointer' : 'not-allowed';
     });
   </script>
 </body>
