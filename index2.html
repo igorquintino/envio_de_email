@@ -23,7 +23,6 @@
     <img height="1" width="1" style="display:none"
       src="https://www.facebook.com/tr?id=528198167845723&ev=PageView&noscript=1"/>
   </noscript>
-  <!-- End Meta Pixel Code -->
 </head>
 <body>
   <img src="logo4.png" alt="QUINTINO CODERS">
@@ -38,113 +37,70 @@
            style="width: 100%; max-width: 400px; padding: 12px; border-radius: 6px; border: none; margin-bottom: 15px;" autocomplete="email">
     <br>
     
-    <button id="enviarBtn" disabled
+    <button id="baixarBtn" disabled
             style="background-color: #555; color: #aaa; font-weight: bold; border: none; padding: 12px 24px; border-radius: 6px; cursor: not-allowed;">
-      Liberar Download
+      Baixar
     </button>
-
-    <!-- Mensagem só para erros -->
-    <p id="statusEmail" style="margin-top: 15px; color: #f87171;"></p>
-
-    <!-- Seção de download (fica oculta até liberar) -->
-    <div id="downloadSection" style="display:none; margin-top: 20px;">
-      <a id="downloadLink" href="#" download
-         style="display:inline-block; padding: 12px 20px; border-radius: 6px; text-decoration: none; font-weight: bold;">
-        Baixar Currículo
-      </a>
-      <p style="color:#9ae6b4; margin-top:10px;">Se não iniciar automaticamente, clique no botão acima.</p>
-    </div>
   </div>
+
+  <!-- Formulário oculto do Google Forms -->
+  <iframe name="hidden_iframe" style="display:none;"></iframe>
+  <form id="leadForm"
+        action="https://docs.google.com/forms/d/e/1FAIpQLSfZBig3TCIM3_Pk5m_gEQkPcfAAhRAOLhvF7XDMbu9M8DBM_w/formResponse"
+        method="POST" target="hidden_iframe" style="display:none;">
+    <input id="gformEmail" name="entry.1038736519" type="email" />
+  </form>
 
   <script>
     const emailInput = document.getElementById('emailInput');
-    const enviarBtn = document.getElementById('enviarBtn');
-    const statusEmail = document.getElementById('statusEmail');
-    const downloadSection = document.getElementById('downloadSection');
-    const downloadLink = document.getElementById('downloadLink');
+    const baixarBtn = document.getElementById('baixarBtn');
+    const leadForm = document.getElementById('leadForm');
+    const gformEmail = document.getElementById('gformEmail');
 
-    // Validação de e-mail mais permissiva (aceita TLDs longos e "+")
+    // Link direto de download do arquivo no Google Drive
+    const DOWNLOAD_URL = 'https://drive.google.com/uc?export=download&id=1zoF2itav5kKyzRmuEFYfcpePyF8E5iUT';
+
+    // Regex para validar e-mail
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-
-    // ✅ URL completa do seu Railway
-    const API_URL = 'https://enviodemail-production.up.railway.app/enviar-email';
 
     emailInput.addEventListener('input', () => {
       const email = emailInput.value.trim();
       const isValid = emailRegex.test(email);
 
-      statusEmail.textContent = '';
-      downloadSection.style.display = 'none';
-
       if (isValid) {
-        enviarBtn.disabled = false;
-        enviarBtn.style.backgroundColor = '#a855f7';
-        enviarBtn.style.color = '#fff';
-        enviarBtn.style.cursor = 'pointer';
+        baixarBtn.disabled = false;
+        baixarBtn.style.backgroundColor = '#a855f7';
+        baixarBtn.style.color = '#fff';
+        baixarBtn.style.cursor = 'pointer';
       } else {
-        enviarBtn.disabled = true;
-        enviarBtn.style.backgroundColor = '#555';
-        enviarBtn.style.color = '#aaa';
-        enviarBtn.style.cursor = 'not-allowed';
+        baixarBtn.disabled = true;
+        baixarBtn.style.backgroundColor = '#555';
+        baixarBtn.style.color = '#aaa';
+        baixarBtn.style.cursor = 'not-allowed';
       }
     });
 
-    enviarBtn.addEventListener('click', async () => {
+    baixarBtn.addEventListener('click', (e) => {
+      e.preventDefault();
       const email = emailInput.value.trim();
-      if (!emailRegex.test(email)) {
-        statusEmail.textContent = 'Por favor, insira um e-mail válido.';
-        return;
+      if (!emailRegex.test(email)) return;
+
+      // Envia o e-mail para o Google Forms
+      gformEmail.value = email;
+      try { leadForm.submit(); } catch (err) {}
+
+      // Pixel opcional
+      if (typeof fbq === 'function') {
+        fbq('track', 'Lead', { content_name: 'Curriculo Perfeito' });
       }
 
-      // estado "carregando"
-      enviarBtn.disabled = true;
-      const originalText = enviarBtn.textContent;
-      enviarBtn.textContent = 'Liberando...';
-      enviarBtn.style.backgroundColor = '#555';
-      enviarBtn.style.color = '#aaa';
-      statusEmail.textContent = '';
-
-      try {
-        const resp = await fetch(API_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email })
-        });
-
-        const data = await resp.json().catch(() => ({}));
-
-        if (!resp.ok || !data.downloadUrl) {
-          throw new Error(data?.error || 'Não foi possível liberar o download.');
-        }
-
-        // Pixel opcional
-        if (typeof fbq === 'function') {
-          fbq('track', 'Lead', { content_name: 'Curriculo Perfeito' });
-        }
-
-        // Libera a seção e configura o link
-        downloadLink.href = data.downloadUrl;
-        downloadSection.style.display = 'block';
-
-        // Inicia o download automático
-        const a = document.createElement('a');
-        a.href = data.downloadUrl;
-        a.setAttribute('download', '');
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-
-      } catch (err) {
-        statusEmail.textContent = err.message || 'Erro ao liberar o download.';
-      } finally {
-        // restaura botão (mantém habilitado se e-mail ainda é válido)
-        enviarBtn.textContent = originalText;
-        const stillValid = emailRegex.test(emailInput.value.trim());
-        enviarBtn.disabled = !stillValid;
-        enviarBtn.style.backgroundColor = stillValid ? '#a855f7' : '#555';
-        enviarBtn.style.color = stillValid ? '#fff' : '#aaa';
-        enviarBtn.style.cursor = stillValid ? 'pointer' : 'not-allowed';
-      }
+      // Dispara o download
+      const a = document.createElement('a');
+      a.href = DOWNLOAD_URL;
+      a.setAttribute('download', '');
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
     });
   </script>
 </body>
