@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Currículo Perfeito</title>
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css?v=1">
 </head>
 <body>
   <img src="logo4.png" alt="QUINTINO CODERS">
@@ -12,62 +12,78 @@
   <p>Um modelo direto, moderno e pensado para quem quer conquistar o primeiro emprego na programação.</p>
 
   <div id="formulario-email" style="text-align: center; background-color: #1a1a1a; padding: 30px; border-radius: 12px; max-width: 500px; margin: auto;">
-    <p style="color: #ccc; font-size: 16px; margin-bottom: 25px;">Digite seu e-mail para receber o currículo automaticamente na sua caixa de entrada.</p>
+    <p style="color: #ccc; font-size: 16px; margin-bottom: 25px;">
+      Digite seu e-mail para liberar o download do currículo.
+    </p>
     
+    <label for="emailInput" style="position:absolute; left:-9999px;">E-mail</label>
     <input type="email" id="emailInput" placeholder="Digite seu e-mail"
-           style="width: 100%; max-width: 400px; padding: 12px; border-radius: 6px; border: none; margin-bottom: 15px;">
-    <br>
-    
-    <button id="enviarBtn" disabled
-            style="background-color: #555; color: #aaa; font-weight: bold; border: none; padding: 12px 24px; border-radius: 6px; cursor: not-allowed;">
-      Enviar Currículo
-    </button>
+           style="width: 100%; max-width: 400px; padding: 12px; border-radius: 6px; border: none; margin-bottom: 15px;" autocomplete="email">
 
-    <p id="statusEmail" style="margin-top: 15px; color: #ccc;"></p>
+    <button id="baixarBtn" disabled
+            style="background-color: #555; color: #aaa; font-weight: bold; border: none; padding: 12px 24px; border-radius: 6px; cursor: not-allowed;">
+      Baixar
+    </button>
   </div>
 
   <script>
+    // === CONFIGS ===
+    // Google Forms – seu FORM_ID e ENTRY_ID
+    const FORM_ACTION = 'https://docs.google.com/forms/d/e/1FAIpQLSfZBig3TCIM3_Pk5m_gEQkPcfAAhRAOLhvF7XDMbu9M8DBM_w/formResponse';
+    const ENTRY_NAME  = 'entry.1038736519';
+    // Link direto do Drive:
+    const DOWNLOAD_URL = 'https://drive.google.com/uc?export=download&id=1zoF2itav5kKyzRmuEFYfcpePyF8E5iUT';
+
     const emailInput = document.getElementById('emailInput');
-    const enviarBtn = document.getElementById('enviarBtn');
-    const statusEmail = document.getElementById('statusEmail');
+    const baixarBtn  = document.getElementById('baixarBtn');
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
+    // Validação: habilita o botão só com e-mail válido
     emailInput.addEventListener('input', () => {
-      const email = emailInput.value;
-      const isValid = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/.test(email);
-
-      if (isValid) {
-        enviarBtn.disabled = false;
-        enviarBtn.style.backgroundColor = '#a855f7';
-        enviarBtn.style.color = '#fff';
-        enviarBtn.style.cursor = 'pointer';
-        statusEmail.textContent = '';
-      } else {
-        enviarBtn.disabled = true;
-        enviarBtn.style.backgroundColor = '#555';
-        enviarBtn.style.color = '#aaa';
-        enviarBtn.style.cursor = 'not-allowed';
-        statusEmail.textContent = 'Por favor, insira um e-mail válido.';
-      }
+      const ok = emailRegex.test(emailInput.value.trim());
+      baixarBtn.disabled = !ok;
+      baixarBtn.style.backgroundColor = ok ? '#a855f7' : '#555';
+      baixarBtn.style.color = ok ? '#fff' : '#aaa';
+      baixarBtn.style.cursor = ok ? 'pointer' : 'not-allowed';
     });
 
-    enviarBtn.addEventListener('click', () => {
-      const email = emailInput.value;
+    // Clique: envia para o Forms e baixa o arquivo
+    baixarBtn.addEventListener('click', async (e) => {
+      e.preventDefault();
+      const email = emailInput.value.trim();
+      if (!emailRegex.test(email)) return;
 
-      fetch("/enviar-email", {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email })
-      })
-      .then(res => res.json())
-      .then(data => {
-        statusEmail.textContent = data.message || 'Tudo certo!';
-        statusEmail.style.color = '#4ade80';
-      })
-      .catch(err => {
-        console.error(err);
-        statusEmail.textContent = 'Erro ao enviar e-mail.';
-        statusEmail.style.color = '#f87171';
-      });
+      // loading
+      const original = baixarBtn.textContent;
+      baixarBtn.textContent = 'Processando...';
+      baixarBtn.disabled = true;
+      baixarBtn.style.backgroundColor = '#555';
+      baixarBtn.style.color = '#aaa';
+
+      // Envia e-mail ao Google Forms (no-cors para não travar por CORS)
+      try {
+        const formData = new FormData();
+        formData.append(ENTRY_NAME, email);
+        await fetch(FORM_ACTION, { method: 'POST', mode: 'no-cors', body: formData });
+      } catch (_) {
+        // mesmo que falhe a coleta, seguimos com o download
+      }
+
+      // Dispara o download direto do Drive
+      const a = document.createElement('a');
+      a.href = DOWNLOAD_URL;
+      a.setAttribute('download', '');
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+
+      // restaura botão
+      baixarBtn.textContent = original;
+      const stillOk = emailRegex.test(emailInput.value.trim());
+      baixarBtn.disabled = !stillOk;
+      baixarBtn.style.backgroundColor = stillOk ? '#a855f7' : '#555';
+      baixarBtn.style.color = stillOk ? '#fff' : '#aaa';
+      baixarBtn.style.cursor = stillOk ? 'pointer' : 'not-allowed';
     });
   </script>
 </body>
